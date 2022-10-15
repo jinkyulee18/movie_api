@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "movie_api",
+  "version": "1.0.0",
+  "main": "server.js",
+  "devDependencies": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
