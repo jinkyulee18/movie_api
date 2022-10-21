@@ -1,5 +1,5 @@
 {
-  "name": "package.json",
+  "name": "express",
   "version": "1.0.0",
   "description": "first release",
   "main": "index.js",
