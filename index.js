@@ -52,7 +52,8 @@ let topTenMoveis = [
 ];
 
 // setup the logger
-app.use(morgan('combined', {stream: accessLogStream}));
+app.use(morgan('common', {stream: accessLogStream}));
+  app.use(express.static('public'));
 
 app.get('/', (req, res) => {
   res.send('Welcome to my app!');
