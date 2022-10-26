@@ -8,7 +8,7 @@ const app = express();
 // a ‘log.txt’ file is created in root directory
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'})
 
-let topTenMoveis = [
+let topTenMovies = [
   {
     Title: 'City Lights',
     Director: 'Charlie Chaplin'
@@ -61,10 +61,6 @@ app.get('/', (req, res) => {
 
 app.get('/secreturl', (req, res) => {
   res.send('This is a secret url with super top-secret content.');
-});
-
-app.get('/documentation', (req, res) => {
-  res.sendFile('public/documentation.html', { root: __dirname });
 });
 
 app.get('/movies', (req, res) => {
