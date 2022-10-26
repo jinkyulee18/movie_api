@@ -74,7 +74,7 @@ app.get('/movies', (req, res) => {
 // setup for Error
   app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.status(500).send('Something broke.');
   });
 
 app.listen(8080, () => {
