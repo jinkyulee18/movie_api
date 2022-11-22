@@ -14,7 +14,10 @@ require('./passport');
 
 //log requrests to server
 app.use(morgan("common"));
+
 let auth = require('./auth')(app);
+
+
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -24,9 +27,10 @@ const Directors = Models.Director;
 
 
 
-const url = "mongodb://127.0.0.1:27017";
+// const url = "mongodb://127.0.0.1:27017";
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-mongoose.connect(url).then(() => {
+mongoose.connect(process.env.CONNECTION_URI).then(() => {
     console.log("Connected to Database");
 }).catch((err) => {
     console.log("Not Connected to Database ERROR! ", err);
@@ -177,6 +181,7 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
 
 //Add new users
 app.post('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
+  let hashedPassword = Users.hashPassword(req.body.Password);
   Users.findOne({ Username: req.body.Username })
     .then((user) => {
       if (user) {
@@ -185,7 +190,7 @@ app.post('/users', passport.authenticate('jwt', { session: false }), (req, res) 
         Users
           .create({
             Username: req.body.Username,
-            Password: req.body.Password,
+            Password: hashedPassword,
             Email: req.body.Email,
             Birthday: req.body.Birthday
           })
@@ -236,6 +241,6 @@ app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { se
 
 //PORT
 const port = process.env.PORT || 8080;
-app.listen(port, '0.0.0.0', () => {
-    console.log('listening on Port ' + port);
+app.listen(port, '0.0.0.0',() => {
+ console.log('Listening on Port ' + port);
 });
