@@ -3,8 +3,12 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   uuid = require('uuid'),
   fs = require('fs'),
-  Models = require('./models.js'),
-  path = require('path');
+  Models = require('./models.js');
+
+ 
+
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 
 const app = express();
 const mongoose = require('mongoose');
@@ -25,18 +29,6 @@ const Genres = Models.Genre;
 const Directors = Models.Director;
 
 
-
-
-// const url = "mongodb://127.0.0.1:27017";
-mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-mongoose.connect(process.env.CONNECTION_URI).then(() => {
-    console.log("Connected to Database");
-}).catch((err) => {
-    console.log("Not Connected to Database ERROR! ", err);
-});
-
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
@@ -44,6 +36,15 @@ app.use(bodyParser.urlencoded({ extended: true}));
 const cors = require('cors');
 app.use(cors());
 
+
+// const url = "mongodb://127.0.0.1:27017";
+mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// mongoose.connect(process.env.CONNECTION_URI).then(() => {
+//     console.log("Connected to Database");
+// }).catch((err) => {
+//     console.log("Not Connected to Database ERROR! ", err);
+// });
 
 //fs.createWriteStream is used to create a write stream while path.join appends it to log,txt file
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'})
@@ -180,32 +181,59 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
 });
 
 //Add new users
-app.post('/users', passport.authenticate('jwt', { session: false }), (req, res) => {
-  let hashedPassword = Users.hashPassword(req.body.Password);
-  Users.findOne({ Username: req.body.Username })
-    .then((user) => {
-      if (user) {
-        return res.status(400).send(req.body.Name + ' already exists');
-      } else {
-        Users
-          .create({
-            Username: req.body.Username,
-            Password: hashedPassword,
-            Email: req.body.Email,
-            Birthday: req.body.Birthday
-          })
-          .then((user) =>{res.status(201).json(user) })
-        .catch((error) => {
-          console.error(error);
-          res.status(500).send('Error: ' + error);
-        })
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send('Error: ' + error);
-    });
-});
+app.post('/users',
+  // Validation logic here for request
+  //you can either use a chain of methods like .not().isEmpty()
+  //which means "opposite of isEmpty" in plain english "is not empty"
+  //or use .isLength({min: 5}) which means
+  //minimum value of 5 characters are only allowed
+  [
+    check('Username', 'Username is required').isLength({min: 5}),
+    check('Username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('Password', 'Password is required').not().isEmpty(),
+    check('Email', 'Email does not appear to be valid').isEmail()
+  ], (req, res) => {
+
+  // check the validation object for errors
+    let errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    let hashedPassword = Users.hashPassword(req.body.Password);
+    Users.findOne({ Username: req.body.Username }) // Search to see if a user with the requested username already exists
+      .then((user) => {
+        if (user) {
+          //If the user is found, send a response that it already exists
+          return res.status(400).send(req.body.Username + ' already exists');
+        } else {
+          Users
+            .create({
+              Username: req.body.Username,
+              Password: hashedPassword,
+              Email: req.body.Email,
+              Birthday: req.body.Birthday
+            })
+            .then((user) => { res.status(201).json(user) })
+            .catch((error) => {
+              console.error(error);
+              res.status(500).send('Error: ' + error);
+            });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+      });
+  });
+
+  // check the validation object for errors
+let errors = validationResult(require);
+
+if (!errors.isEmpty()) {
+  return res.status(422).json({ errors: errors.array() });
+}
 
 // Delete a user by username
 app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
