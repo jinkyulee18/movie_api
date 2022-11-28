@@ -16,19 +16,15 @@ const { check, validationResult } = require('express-validator');
 const passport = require('passport');
 require('./passport');
 
-//log requrests to server
-app.use(morgan("common"));
 
 let auth = require('./auth')(app);
-
-
 
 const Movies = Models.Movie;
 const Users = Models.User;
 const Genres = Models.Genre;
 const Directors = Models.Director;
 
-
+app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
 
@@ -41,15 +37,18 @@ app.use(cors());
 mongoose.connect(process.env.CONNECTION_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // mongoose.connect(process.env.CONNECTION_URI).then(() => {
-//     console.log("Connected to Database");
-// }).catch((err) => {
-//     console.log("Not Connected to Database ERROR! ", err);
-// });
-
-//fs.createWriteStream is used to create a write stream while path.join appends it to log,txt file
-const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'})
-app.use(morgan('common', {stream: accessLogStream}));
-app.use(express.static('public'));
+  //     console.log("Connected to Database");
+  // }).catch((err) => {
+    //     console.log("Not Connected to Database ERROR! ", err);
+    // });
+    
+    //fs.createWriteStream is used to create a write stream while path.join appends it to log,txt file
+    const accessLogStream = fs.createWriteStream(path.join(__dirname, 'log.txt'), {flags: 'a'})
+    app.use(morgan('common', {stream: accessLogStream}));
+    app.use(express.static('public'));
+    
+//log requrests to server
+app.use(morgan("common"));
 
 //default text response
 app.get('/', (req, res) => {
