@@ -2,7 +2,7 @@
   "name": "mongoose",
   "version": "1.0.0",
   "description": "movie mongoose",
-  "main": "models.js",
+  "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
