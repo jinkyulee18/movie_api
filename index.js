@@ -1,12 +1,12 @@
 const express = require('express'),
-  morgan = require('morgan'),
+  
   bodyParser = require('body-parser'),
   uuid = require('uuid'),
   fs = require('fs'),
   Models = require('./models.js');
 
  
-
+const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 
